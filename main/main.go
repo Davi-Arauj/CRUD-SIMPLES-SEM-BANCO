@@ -11,10 +11,18 @@ func rotaPrincipal(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Bem vindo")
 }
 
+func rotearCliente(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		entyties.ListarClientes(w, r)
+	} else if r.Method == "POST" {
+		entyties.CadastrarLivros(w, r)
+	}
+}
+
 func configurandoRotas() {
 	http.HandleFunc("/", rotaPrincipal)
-
-	http.HandleFunc("/clientes", entyties.ListarClientes)
+	http.HandleFunc("/clientes", rotearCliente)
+	//http.HandleFunc("/clientes", entyties.CadastrarLivros)
 }
 
 func configurandoServidor() {
