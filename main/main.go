@@ -22,7 +22,7 @@ func rotearCliente(w http.ResponseWriter, r *http.Request) {
 func configurandoRotas() {
 	http.HandleFunc("/", rotaPrincipal)
 	http.HandleFunc("/clientes", rotearCliente)
-	//http.HandleFunc("/clientes", entyties.CadastrarLivros)
+	http.HandleFunc("/clientes/", entyties.BuscarCliente)
 }
 
 func configurandoServidor() {
