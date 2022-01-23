@@ -56,11 +56,6 @@ func BuscarCliente(w http.ResponseWriter, r *http.Request) {
 
 	partes := strings.Split(r.URL.Path, "/")
 
-	if len(partes) > 3 {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
 	id, error := strconv.Atoi(partes[2])
 
 	if error != nil {
@@ -71,9 +66,40 @@ func BuscarCliente(w http.ResponseWriter, r *http.Request) {
 	for _, cli := range Clientes {
 		if cli.Id == id {
 			json.NewEncoder(w).Encode(cli)
+			return
+
 		}
 	}
 
 	w.WriteHeader(http.StatusNotFound)
+
+}
+
+func DeletarCliente(w http.ResponseWriter, r *http.Request) {
+	partes := strings.Split(r.URL.Path, "/")
+
+	id, error := strconv.Atoi(partes[2])
+
+	if error != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	var indiceCliente int = -1
+
+	for indice, cli := range Clientes {
+		if cli.Id == id {
+			indiceCliente = indice
+			break
+		}
+	}
+
+	if indiceCliente < 0 {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	ladoEsquerdo := Clientes[0:indiceCliente]
+	ladoDireito := Clientes[indiceCliente+1:]
+	Clientes = append(ladoEsquerdo, ladoDireito...)
 
 }
