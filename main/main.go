@@ -13,6 +13,7 @@ func rotaPrincipal(w http.ResponseWriter, r *http.Request) {
 }
 
 func rotearCliente(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 
 	partes := strings.Split(r.URL.Path, "/")
 
@@ -27,6 +28,8 @@ func rotearCliente(w http.ResponseWriter, r *http.Request) {
 			entyties.BuscarCliente(w, r)
 		} else if r.Method == "DELETE" {
 			entyties.DeletarCliente(w, r)
+		} else if r.Method == "PUT" {
+			entyties.AtualizarCliente(w, r)
 		} else {
 			w.WriteHeader(http.StatusNotFound)
 		}
