@@ -20,9 +20,7 @@ func rotearCliente(w http.ResponseWriter, r *http.Request) {
 	partes := strings.Split(r.URL.Path, "/")
 
 	if len(partes) == 2 || len(partes) == 3 && partes[2] == "" {
-		if r.Method == "GET" {
-			entyties.ListarClientes(w, r)
-		} else if r.Method == "POST" {
+		if r.Method == "POST" {
 			entyties.CadastrarLivros(w, r)
 		}
 	} else if len(partes) == 3 || len(partes) == 4 && partes[3] == "" {
@@ -45,13 +43,13 @@ func rotearCliente(w http.ResponseWriter, r *http.Request) {
 func configurandoRotas(roteador *mux.Router) {
 
 	roteador.HandleFunc("/", rotaPrincipal)
-	// roteador.HandleFunc("/clientes", rotearCliente)
+	roteador.HandleFunc("/clientes", entyties.ListarClientes).Methods("GET")
 	// roteador.HandleFunc("/clientes/", rotearCliente)
 }
 
 func configurandoServidor() {
 
-	roteador := mux.NewRouter()
+	roteador := mux.NewRouter().StrictSlash(true)
 	configurandoRotas(roteador)
 
 	fmt.Println("O servidor está Rodando na porta 1337")
