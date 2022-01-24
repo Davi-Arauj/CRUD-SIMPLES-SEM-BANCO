@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 func rotaPrincipal(w http.ResponseWriter, r *http.Request) {
@@ -40,18 +42,21 @@ func rotearCliente(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func configurandoRotas() {
-	http.HandleFunc("/", rotaPrincipal)
-	http.HandleFunc("/clientes", rotearCliente)
-	http.HandleFunc("/clientes/", rotearCliente)
+func configurandoRotas(roteador *mux.Router) {
+
+	roteador.HandleFunc("/", rotaPrincipal)
+	// roteador.HandleFunc("/clientes", rotearCliente)
+	// roteador.HandleFunc("/clientes/", rotearCliente)
 }
 
 func configurandoServidor() {
-	configurandoRotas()
+
+	roteador := mux.NewRouter()
+	configurandoRotas(roteador)
 
 	fmt.Println("O servidor está Rodando na porta 1337")
 
-	log.Fatal(http.ListenAndServe(":1337", nil))
+	log.Fatal(http.ListenAndServe(":1337", roteador))
 }
 
 func main() {
