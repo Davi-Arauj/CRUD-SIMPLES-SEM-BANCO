@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 
-	"strings"
+	"github.com/gorilla/mux"
 )
 
 type Cliente struct {
@@ -37,13 +38,13 @@ func ListarClientes(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(Clientes)
 }
 
-func CadastrarLivros(w http.ResponseWriter, r *http.Request) {
+func CadastrarCliente(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
 
-	w.WriteHeader(http.StatusCreated)
 	body, error := ioutil.ReadAll(r.Body)
 
 	if error != nil {
-		fmt.Println(error.Error())
+		log.Fatal(error.Error())
 	}
 
 	var novoCliente Cliente
@@ -51,14 +52,14 @@ func CadastrarLivros(w http.ResponseWriter, r *http.Request) {
 	novoCliente.Id = len(Clientes) + 1
 	Clientes = append(Clientes, novoCliente)
 	json.NewEncoder(w).Encode(novoCliente)
-
+	w.WriteHeader(http.StatusCreated)
 }
 
 func BuscarCliente(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+	vars := mux.Vars(r)
 
-	partes := strings.Split(r.URL.Path, "/")
-
-	id, error := strconv.Atoi(partes[2])
+	id, error := strconv.Atoi(vars["Id"])
 
 	if error != nil {
 		w.WriteHeader(http.StatusNotFound)
@@ -78,9 +79,11 @@ func BuscarCliente(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeletarCliente(w http.ResponseWriter, r *http.Request) {
-	partes := strings.Split(r.URL.Path, "/")
+	w.Header().Add("Content-Type", "application/json")
 
-	id, error := strconv.Atoi(partes[2])
+	vars := mux.Vars(r)
+
+	id, error := strconv.Atoi(vars["Id"])
 
 	if error != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -107,10 +110,10 @@ func DeletarCliente(w http.ResponseWriter, r *http.Request) {
 }
 
 func AtualizarCliente(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+	vars := mux.Vars(r)
 
-	partes := strings.Split(r.URL.Path, "/")
-
-	id, error := strconv.Atoi(partes[2])
+	id, error := strconv.Atoi(vars["Id"])
 
 	if error != nil {
 		w.WriteHeader(http.StatusBadRequest)
