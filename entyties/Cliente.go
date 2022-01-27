@@ -34,12 +34,12 @@ var Clientes = []Cliente{
 }
 
 func ListarClientes(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Type", "application/json")
+	
 	json.NewEncoder(w).Encode(Clientes)
 }
 
 func CadastrarCliente(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Type", "application/json")
+	
 
 	body, error := ioutil.ReadAll(r.Body)
 
@@ -56,7 +56,7 @@ func CadastrarCliente(w http.ResponseWriter, r *http.Request) {
 }
 
 func BuscarCliente(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Type", "application/json")
+	
 	vars := mux.Vars(r)
 
 	id, error := strconv.Atoi(vars["Id"])
@@ -79,7 +79,7 @@ func BuscarCliente(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeletarCliente(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Type", "application/json")
+	
 
 	vars := mux.Vars(r)
 
@@ -110,7 +110,6 @@ func DeletarCliente(w http.ResponseWriter, r *http.Request) {
 }
 
 func AtualizarCliente(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Type", "application/json")
 	vars := mux.Vars(r)
 
 	id, error := strconv.Atoi(vars["Id"])
@@ -142,4 +141,12 @@ func AtualizarCliente(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &alteracaoCliente)
 	Clientes[indiceCliente] = alteracaoCliente
 	json.NewEncoder(w).Encode(alteracaoCliente)
+}
+
+func JsonMiddleWare(next http.Handler) http.Handler{
+	return http.HandlerFunc(func (w http.ResponseWriter, r *http.Request)  {
+		w.Header().Add("Content-Type", "application/json")
+
+		next.ServeHTTP(w,r)
+	})
 }

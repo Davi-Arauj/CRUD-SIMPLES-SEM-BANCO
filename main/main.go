@@ -26,6 +26,7 @@ func configurandoRotas(roteador *mux.Router) {
 func configurandoServidor() {
 
 	roteador := mux.NewRouter().StrictSlash(true)
+	roteador.Use(entyties.JsonMiddleWare)
 	configurandoRotas(roteador)
 
 	fmt.Println("O servidor está Rodando na porta 1337")
