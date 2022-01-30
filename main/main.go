@@ -1,6 +1,7 @@
 package main
 
 import (
+	"CRUD-Simples/db"
 	"CRUD-Simples/entyties"
 	"fmt"
 	"log"
@@ -35,6 +36,6 @@ func configurandoServidor() {
 }
 
 func main() {
-	configurandoServidor()
-
+	//configurandoServidor()
+	db.ConnectDB()
 }
