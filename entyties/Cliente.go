@@ -1,152 +1,82 @@
 package entyties
 
 import (
+	"CRUD-Simples/db"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/jinzhu/gorm"
 )
 
 type Cliente struct {
-	Id    int    `json:"id"`
+	gorm.Model
 	Name  string `json:"Nome"`
 	Email string `json:"e-mail"`
 	Fone  int    `json:"fone"`
 }
 
-var Clientes = []Cliente{
-	Cliente{
-		1,
-		"José",
-		"j@j.com",
-		8888,
-	},
-	Cliente{
-		2,
-		"Davi",
-		"d@d.com",
-		8888,
-	},
-}
-
 func ListarClientes(w http.ResponseWriter, r *http.Request) {
-	
-	json.NewEncoder(w).Encode(Clientes)
+	var clientes []Cliente
+	db.DB.Find(&clientes)
+
+	json.NewEncoder(w).Encode(&clientes)
 }
 
 func CadastrarCliente(w http.ResponseWriter, r *http.Request) {
-	
+	var novoCliente Cliente
+	json.NewDecoder(r.Body).Decode(&novoCliente)
 
-	body, error := ioutil.ReadAll(r.Body)
+	createdCliente := db.DB.Create(&novoCliente)
 
-	if error != nil {
-		log.Fatal(error.Error())
+	err := createdCliente.Error
+
+	if err != nil {
+		fmt.Println(err)
 	}
 
-	var novoCliente Cliente
-	json.Unmarshal(body, &novoCliente)
-	novoCliente.Id = len(Clientes) + 1
-	Clientes = append(Clientes, novoCliente)
-	json.NewEncoder(w).Encode(novoCliente)
-	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(&createdCliente)
+
 }
 
 func BuscarCliente(w http.ResponseWriter, r *http.Request) {
-	
-	vars := mux.Vars(r)
 
-	id, error := strconv.Atoi(vars["Id"])
+	params := mux.Vars(r)
+	var cliente Cliente
+	db.DB.First(&cliente, params["Id"])
 
-	if error != nil {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	for _, cli := range Clientes {
-		if cli.Id == id {
-			json.NewEncoder(w).Encode(cli)
-			return
-
-		}
-	}
-
-	w.WriteHeader(http.StatusNotFound)
+	json.NewEncoder(w).Encode(&cliente)
 
 }
 
 func DeletarCliente(w http.ResponseWriter, r *http.Request) {
-	
 
 	vars := mux.Vars(r)
+	var cliente Cliente
 
-	id, error := strconv.Atoi(vars["Id"])
+	db.DB.First(&cliente, vars["Id"])
+	db.DB.Delete(&cliente)
 
-	if error != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	var indiceCliente int = -1
-
-	for indice, cli := range Clientes {
-		if cli.Id == id {
-			indiceCliente = indice
-			break
-		}
-	}
-
-	if indiceCliente < 0 {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	ladoEsquerdo := Clientes[0:indiceCliente]
-	ladoDireito := Clientes[indiceCliente+1:]
-	Clientes = append(ladoEsquerdo, ladoDireito...)
+	json.NewEncoder(w).Encode(&cliente)
 
 }
 
 func AtualizarCliente(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	var clienteUpdate Cliente
+	json.NewDecoder(r.Body).Decode(&clienteUpdate)
+	var cliente Cliente
+	db.DB.First(&cliente, vars["Id"])
+	db.DB.Model(&cliente).Update(&clienteUpdate)
 
-	id, error := strconv.Atoi(vars["Id"])
-
-	if error != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	var indiceCliente int = -1
-
-	for indice, cli := range Clientes {
-		if cli.Id == id {
-			indiceCliente = indice
-			break
-		}
-	}
-
-	if indiceCliente < 0 {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	body, error := ioutil.ReadAll(r.Body)
-	if error != nil {
-		fmt.Println(error.Error())
-	}
-
-	var alteracaoCliente Cliente
-	json.Unmarshal(body, &alteracaoCliente)
-	Clientes[indiceCliente] = alteracaoCliente
-	json.NewEncoder(w).Encode(alteracaoCliente)
+	json.NewEncoder(w).Encode(&cliente)
 }
 
-func JsonMiddleWare(next http.Handler) http.Handler{
-	return http.HandlerFunc(func (w http.ResponseWriter, r *http.Request)  {
+func JsonMiddleWare(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "application/json")
 
-		next.ServeHTTP(w,r)
+		next.ServeHTTP(w, r)
 	})
 }

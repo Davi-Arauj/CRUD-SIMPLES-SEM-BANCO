@@ -30,12 +30,16 @@ func configurandoServidor() {
 	roteador.Use(entyties.JsonMiddleWare)
 	configurandoRotas(roteador)
 
-	fmt.Println("O servidor está Rodando na porta 1337")
+	fmt.Println("O servidor está Rodando na porta 1339")
 
-	log.Fatal(http.ListenAndServe(":1337", roteador))
+	log.Fatal(http.ListenAndServe(":1339", roteador))
 }
 
 func main() {
-	//configurandoServidor()
 	db.ConnectDB()
+	db.DB.AutoMigrate(&entyties.Cliente{})
+	configurandoServidor()
+
+	defer db.DB.Close()
+
 }

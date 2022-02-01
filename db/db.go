@@ -1,7 +1,7 @@
 package db
 
 import (
-	"CRUD-Simples/entyties"
+	//"CRUD-Simples/entyties"
 	"fmt"
 	"os"
 
@@ -9,7 +9,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
-var db *gorm.DB
+var DB *gorm.DB
 var err error
 
 func ConnectDB() {
@@ -26,18 +26,20 @@ func ConnectDB() {
 	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s port=%s", host, user, dbname, dbpassword, dbPort)
 
 	// Openning connection to database
-	db, err = gorm.Open(dialect, dbURI)
+	DB, err = gorm.Open(dialect, dbURI)
 
 	if err != nil {
-		panic(err)
+		panic(err.Error())
 	} else {
 		fmt.Println("Connected to database successfully")
 	}
 
 	// Close the databse connection when the main function closes
-	defer db.Close()
+	// defer DB.Close()
 
 	// Make migrations to the database if they haven't been made already
-	cliente := entyties.Cliente{}
-	db.AutoMigrate(&cliente)
+	// clientes := []entyties.Cliente{}
+	// clientes = entyties.Clientes
+	// DB.AutoMigrate(&clientes)
+
 }
