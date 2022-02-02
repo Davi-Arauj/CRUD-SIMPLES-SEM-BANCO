@@ -36,10 +36,16 @@ func configurandoServidor() {
 }
 
 func main() {
+
 	db.ConnectDB()
+
+	//Criando tabela Cliente de acordo com a struct
 	db.DB.AutoMigrate(&entyties.Cliente{})
+
+	//Iniciando o Servidor
 	configurandoServidor()
 
+	// Close the databse connection when the main function closes	
 	defer db.DB.Close()
 
 }

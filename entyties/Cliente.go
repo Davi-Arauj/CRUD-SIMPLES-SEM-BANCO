@@ -3,7 +3,6 @@ package entyties
 import (
 	"CRUD-Simples/db"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -17,10 +16,18 @@ type Cliente struct {
 	Fone  int    `json:"fone"`
 }
 
+//Service do Cliente
 func ListarClientes(w http.ResponseWriter, r *http.Request) {
 	var clientes []Cliente
-	db.DB.Find(&clientes)
 
+	if result := db.DB.Find(&clientes); result.Error != nil {
+		w.WriteHeader(400)
+		panic(result.Error)
+	} else if result.RowsAffected == 0 {
+		w.WriteHeader(http.StatusNotFound)
+	}
+
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(&clientes)
 }
 
@@ -30,12 +37,12 @@ func CadastrarCliente(w http.ResponseWriter, r *http.Request) {
 
 	createdCliente := db.DB.Create(&novoCliente)
 
-	err := createdCliente.Error
-
-	if err != nil {
-		fmt.Println(err)
+	if createdCliente.Error != nil {
+		w.WriteHeader(400)
+		panic(createdCliente.Error)
 	}
 
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(&createdCliente)
 
 }
@@ -44,7 +51,9 @@ func BuscarCliente(w http.ResponseWriter, r *http.Request) {
 
 	params := mux.Vars(r)
 	var cliente Cliente
-	db.DB.First(&cliente, params["Id"])
+	if err := db.DB.First(&cliente, params["Id"]); err.Error != nil {
+		w.WriteHeader(400)
+	}
 
 	json.NewEncoder(w).Encode(&cliente)
 
@@ -55,7 +64,10 @@ func DeletarCliente(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	var cliente Cliente
 
-	db.DB.First(&cliente, vars["Id"])
+	if err := db.DB.First(&cliente, vars["Id"]); err.Error != nil {
+		w.WriteHeader(400)
+		panic(err.Error)
+	}
 	db.DB.Delete(&cliente)
 
 	json.NewEncoder(w).Encode(&cliente)
@@ -67,7 +79,10 @@ func AtualizarCliente(w http.ResponseWriter, r *http.Request) {
 	var clienteUpdate Cliente
 	json.NewDecoder(r.Body).Decode(&clienteUpdate)
 	var cliente Cliente
-	db.DB.First(&cliente, vars["Id"])
+	if err := db.DB.First(&cliente, vars["Id"]); err.Error != nil {
+		w.WriteHeader(400)
+		panic(err.Error)
+	}
 	db.DB.Model(&cliente).Update(&clienteUpdate)
 
 	json.NewEncoder(w).Encode(&cliente)

@@ -34,12 +34,5 @@ func ConnectDB() {
 		fmt.Println("Connected to database successfully")
 	}
 
-	// Close the databse connection when the main function closes
-	// defer DB.Close()
-
-	// Make migrations to the database if they haven't been made already
-	// clientes := []entyties.Cliente{}
-	// clientes = entyties.Clientes
-	// DB.AutoMigrate(&clientes)
 
 }
