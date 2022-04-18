@@ -11,7 +11,7 @@ import (
 )
 
 func rotaPrincipal(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Bem vindo")
+	fmt.Fprintf(w, "Bem vindo ao MUX")
 }
 
 func configurandoRotas(roteador *mux.Router) {
@@ -29,14 +29,11 @@ func configurandoServidor() {
 	roteador := mux.NewRouter().StrictSlash(true)
 	roteador.Use(entyties.JsonMiddleWare)
 	configurandoRotas(roteador)
-
 	fmt.Println("O servidor está Rodando na porta 1339")
-
 	log.Fatal(http.ListenAndServe(":1339", roteador))
 }
 
 func main() {
-
 	db.ConnectDB()
 
 	//Criando tabela Cliente de acordo com a struct
@@ -45,7 +42,6 @@ func main() {
 	//Iniciando o Servidor
 	configurandoServidor()
 
-	// Close the databse connection when the main function closes	
+	// Close the databse connection when the main function closes
 	defer db.DB.Close()
-
 }
